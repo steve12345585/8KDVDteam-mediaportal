@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Workflow DescriptorVersion="1.0">
+  <MenuActions>
+    <PushNavigationTransition 
+      Id="{5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B}"
+      Name="Home->EightKDVDMainMenu"
+      DisplayCategory="z-8KDVD"
+      SortOrder="a"
+      SourceStates="7F702D9C-F2DD-42da-9ED8-0BA92F07787F"
+      TargetState="3C4D5E6F-7A8B-9C0D-1E2F-3A4B5C6D7E8F"
+      DisplayTitle="8KDVD"/>
+  </MenuActions>
+</Workflow>

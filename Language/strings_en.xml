@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Language>
+  <Section Name="EightKDVD">
+    <String Name="MenuEntry" Text="8KDVD Player"/>
+    <String Name="Playing" Text="Playing 8KDVD"/>
+    <String Name="DiscDetected" Text="8KDVD disc detected"/>
+    <String Name="DiscNotFound" Text="8KDVD disc not found"/>
+    <String Name="CertificateInvalid" Text="Certificate verification failed"/>
+    <String Name="LicenseRequired" Text="License required for playback"/>
+    
+    <String Name="Settings.DefaultQuality" Text="Default Quality"/>
+    <String Name="Settings.DefaultQuality.Help" Text="Default playback quality (8K, 4K, 1080p)"/>
+    
+    <String Name="Settings.AutoSwitch" Text="Auto-Switch Quality"/>
+    <String Name="Settings.AutoSwitch.Help" Text="Automatically switch quality based on hardware capabilities"/>
+    
+    <String Name="Settings.AutoPlay" Text="Auto-Play on Disc Insertion"/>
+    <String Name="Settings.AutoPlay.Help" Text="Automatically launch menu when 8KDVD disc is inserted"/>
+  </Section>
+</Language>

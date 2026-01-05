@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>EightKDVDPlayer</AssemblyName>
+    <RootNamespace>EightKDVD</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="MediaPortal.Common">
+      <HintPath>$(MediaPortal2Path)\MediaPortal.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="MediaPortal.UI">
+      <HintPath>$(MediaPortal2Path)\MediaPortal.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="MediaPortal.Utilities">
+      <HintPath>$(MediaPortal2Path)\MediaPortal.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="MediaPortal.UI.SkinEngine">
+      <HintPath>$(MediaPortal2Path)\MediaPortal.UI.SkinEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2045.28" />
+    <PackageReference Include="Microsoft.Web.WebView2.WinForms" Version="1.0.2045.28" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="plugin.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Language\**\*.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Skin\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Core\" />
+    <Folder Include="Models\" />
+    <Folder Include="Player\" />
+    <Folder Include="WebView\" />
+    <Folder Include="Configuration\" />
+  </ItemGroup>
+
+</Project>

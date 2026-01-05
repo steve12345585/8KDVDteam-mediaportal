@@ -1,0 +1,99 @@
+<Plugin
+    DescriptorVersion="1.0"
+    Name="EightKDVDPlayer"
+    PluginId="{8A7B9C1D-2E3F-4A5B-6C7D-8E9F0A1B2C3D}"
+    Author="8KDVD Team"
+    Copyright="GPL"
+    Description="8KDVD Player Plugin with WebView2 HTML Menu Support"
+    AutoActivate="false">
+
+  <Version
+    PluginVersion="1.0.0"
+    ReleaseDate="2024-01-01 01:00:00 GMT+01:00"
+    CurrentAPI="1"/>
+
+  <DependsOn>
+    <CoreDependency Name="MediaPortal.Common" CompatibleAPI="2" />
+    <CoreDependency Name="MediaPortal.UI" CompatibleAPI="3" />
+    <CoreDependency Name="MediaPortal.Utilities" CompatibleAPI="1" />
+    <PluginReference PluginId="{D87D92F0-5E71-470a-A2A4-430F90A28BF3}" CompatibleAPI="3"/> <!-- SkinEngine -->
+    <PluginReference PluginId="{A965AFE5-44F9-46e0-980E-40BBE17F25CA}" CompatibleAPI="1"/> <!-- VideoPlayers -->
+    <PluginReference PluginId="{15FB35F7-8C85-4404-BC67-BFF28446158A}" CompatibleAPI="2"/> <!-- Media -->
+    <PluginReference PluginId="{1AFF4467-64B0-4ca1-AF28-9AEDF3525BCE}" CompatibleAPI="1"/> <!-- ConfigurationManager -->
+    <PluginReference PluginId="{B765A4B6-F455-4941-BDAE-2CE45208BFEB}" CompatibleAPI="1"/> <!-- Configuration plugin -->
+    <PluginReference PluginId="{8B61C331-DBE8-4E56-8A1D-11C32D8C850D}" CompatibleAPI="1"/> <!-- FFMpegLib -->
+  </DependsOn>
+
+  <Runtime>
+    <Assembly FileName="EightKDVDPlayer.dll"/>
+    <PluginStateTracker ClassName="EightKDVD.PluginStateTracker"/>
+  </Runtime>
+
+  <!-- Player Builder for 8KDVD discs -->
+  <Register Location="/Players/Builders">
+    <PlayerBuilder Id="{8B1C2D3E-4F5A-6B7C-8D9E-0F1A2B3C4D5E}" ClassName="EightKDVD.Player.EightKDVDPlayerBuilder"/>
+  </Register>
+
+  <!-- MimeType Mapping for .EVO files -->
+  <Register Location="/VideoPlayers/MimeTypeRegistrations">
+    <VideoPlayerMimeTypeMapping Id="8kdvd" ClassName="EightKDVD.Player.EightKDVDPlayer" MimeType="video/8kdvd"/>
+  </Register>
+
+  <!-- Models -->
+  <Register Location="/Models">
+    <Model Id="{1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D}" Name="EightKDVDWorkflowModel" ClassName="EightKDVD.Models.EightKDVDWorkflowModel"/>
+    <Model Id="{2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7E}" Name="WebViewHelperModel" ClassName="EightKDVD.Models.WebViewHelperModel"/>
+  </Register>
+
+  <!-- Workflow States -->
+  <Register Location="/Workflow/States">
+    <WorkflowState 
+      Id="{3C4D5E6F-7A8B-9C0D-1E2F-3A4B5C6D7E8F}"
+      Name="EightKDVDMainMenu" 
+      MainScreen="EightKDVD-main" 
+      WorkflowModel="1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D"
+      DisplayLabel="8KDVD"/>
+    <WorkflowState 
+      Id="{4D5E6F7A-8B9C-0D1E-2F3A-4B5C6D7E8F9A}"
+      Name="EightKDVDPlayer" 
+      MainScreen="EightKDVD-player" 
+      WorkflowModel="1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D"
+      DisplayLabel="[EightKDVD.Playing]"/>
+  </Register>
+
+  <!-- Resources -->
+  <Register Location="/Resources/Skin">
+    <Resource Id="EightKDVDSkin" Directory="Skin" Type="Skin"/>
+  </Register>
+
+  <Register Location="/Resources/Language">
+    <Resource Id="EightKDVDLanguage" Directory="Language" Type="Language"/>
+  </Register>
+
+  <!-- Configuration -->
+  <Register Location="/Configuration/Settings/Plugins">
+    <ConfigSection 
+      Id="EightKDVD" 
+      Redundant="true"
+      Text="8KDVD Player"/>
+  </Register>
+
+  <Register Location="/Configuration/Settings/Plugins/EightKDVD">
+    <ConfigSetting
+      Id="EightKDVDDefaultQuality"
+      Text="[EightKDVD.Settings.DefaultQuality]"
+      HelpText="[EightKDVD.Settings.DefaultQuality.Help]"
+      ClassName="EightKDVD.Configuration.DefaultQuality"/>
+    <ConfigSetting
+      Id="EightKDVDAutoSwitch"
+      Text="[EightKDVD.Settings.AutoSwitch]"
+      HelpText="[EightKDVD.Settings.AutoSwitch.Help]"
+      ClassName="EightKDVD.Configuration.AutoSwitch"/>
+    <ConfigSetting
+      Id="EightKDVDAutoPlay"
+      Text="[EightKDVD.Settings.AutoPlay]"
+      HelpText="[EightKDVD.Settings.AutoPlay.Help]"
+      ClassName="EightKDVD.Configuration.AutoPlay"/>
+  </Register>
+
+</Plugin>

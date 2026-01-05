@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Screen
+    xmlns="www.team-mediaportal.com/2008/mpf/directx"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mp_special_controls="clr-namespace:MediaPortal.UI.SkinEngine.SpecialElements.Controls;assembly=SkinEngine"
+    xmlns:mp_special_workflow="clr-namespace:MediaPortal.UI.SkinEngine.SpecialElements.Workflow;assembly=SkinEngine"
+    mp_special_workflow:WorkflowContext.StateSlot="Root"
+    xmlns:ekdvd="clr-namespace:EightKDVD.Controls;assembly=EightKDVDPlayer"
+    x:Name="EightKDVD-main"
+    Context="{Model Id=1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D}">
+    
+  <Grid>
+    <Grid.Resources>
+      <Model x:Key="WebViewHelperModel" Id="2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7E"/>
+    </Grid.Resources>
+    
+    <!-- Connect WebViewPanel to WebViewHelperModel for JavaScript bridge -->
+    <Grid.Triggers>
+      <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+        <BeginStoryboard>
+          <Storyboard>
+            <!-- This will be handled in code-behind or via binding -->
+          </Storyboard>
+        </BeginStoryboard>
+      </EventTrigger>
+    </Grid.Triggers>
+    
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <!-- WebView2 Control for HTML Menu -->
+    <ekdvd:WebViewPanel 
+      Grid.Row="0"
+      HorizontalAlignment="Stretch" 
+      VerticalAlignment="Stretch"
+      x:Name="WebViewControl"/>
+
+  </Grid>
+</Screen>
