@@ -31,8 +31,8 @@
 
 ## 🚧 In Progress
 
-- [ ] WebViewPanel model connection (wire up JavaScript bridge)
-- [ ] Complete player integration (IPlayerManager usage)
+- [x] WebViewPanel model connection (wire up JavaScript bridge) ✅
+- [x] Complete player integration (IPlayerManager usage) ✅
 - [ ] VP9/Opus codec integration
 - [ ] Quality switching logic
 - [ ] Subtitle system

@@ -6,9 +6,11 @@ using System.Windows.Interop;
 using Microsoft.Web.WebView2.Wpf;
 using MediaPortal.Common;
 using MediaPortal.Common.Logging;
+using MediaPortal.UI.Presentation.Models;
 using EightKDVD.Services;
 using EightKDVD.Core;
 using EightKDVD.WebView;
+using EightKDVD.Models;
 
 namespace EightKDVD.Controls
 {
@@ -23,6 +25,34 @@ namespace EightKDVD.Controls
     private Grid _container;
     private bool _isInitialized = false;
     private JavaScriptBridge _bridge;
+    private WebViewHelperModel _model;
+    
+    /// <summary>
+    /// Dependency property for the model
+    /// </summary>
+    public static readonly DependencyProperty ModelProperty =
+      DependencyProperty.Register(
+        "Model",
+        typeof(WebViewHelperModel),
+        typeof(WebViewPanel),
+        new PropertyMetadata(null, OnModelChanged));
+
+    public WebViewHelperModel Model
+    {
+      get { return (WebViewHelperModel)GetValue(ModelProperty); }
+      set { SetValue(ModelProperty, value); }
+    }
+
+    private static void OnModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+      var panel = (WebViewPanel)d;
+      panel._model = (WebViewHelperModel)e.NewValue;
+      if (panel._model != null && panel._bridge == null)
+      {
+        panel._bridge = new JavaScriptBridge(panel._model);
+        panel.Logger.Debug("8KDVD Player: JavaScript bridge connected to model");
+      }
+    }
 
     public WebViewPanel()
     {
@@ -164,10 +194,15 @@ namespace EightKDVD.Controls
         var messageObj = System.Text.Json.JsonSerializer.Deserialize<JavaScriptMessage>(message);
         if (messageObj != null)
         {
-          // Forward to JavaScript bridge
+          // Forward to JavaScript bridge (which connects to model)
           if (_bridge != null)
           {
             _bridge.HandleCall(messageObj.Function, messageObj.Parameters);
+          }
+          else if (_model != null)
+          {
+            // Fallback: call model directly if bridge not initialized
+            _model.HandleJavaScriptCall(messageObj.Function, messageObj.Parameters?.ToString() ?? "");
           }
           // Also fire event for external handlers
           OnJavaScriptCall?.Invoke(messageObj.Function, messageObj.Parameters?.ToString());
