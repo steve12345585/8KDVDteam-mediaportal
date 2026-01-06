@@ -191,7 +191,31 @@ namespace EightKDVD.Controls
         Logger.Debug($"8KDVD Player: JavaScript message received: {message}");
 
         // Parse JSON message
-        var messageObj = System.Text.Json.JsonSerializer.Deserialize<JavaScriptMessage>(message);
+        // Parse JSON message manually (System.Text.Json not available in .NET Framework 4.8)
+        // Simple parsing for "Function":"name","Parameters":"value" format
+        JavaScriptMessage messageObj = null;
+        try
+        {
+          // Simple JSON parsing - extract function and parameters
+          int funcStart = message.IndexOf("\"Function\":\"") + 12;
+          int funcEnd = message.IndexOf("\"", funcStart);
+          int paramStart = message.IndexOf("\"Parameters\":\"") + 14;
+          int paramEnd = message.IndexOf("\"", paramStart);
+          
+          if (funcStart > 11 && funcEnd > funcStart && paramStart > 13 && paramEnd > paramStart)
+          {
+            messageObj = new JavaScriptMessage
+            {
+              Function = message.Substring(funcStart, funcEnd - funcStart),
+              Parameters = message.Substring(paramStart, paramEnd - paramStart)
+            };
+          }
+        }
+        catch
+        {
+          // If parsing fails, try to extract function name from simple format
+          messageObj = new JavaScriptMessage { Function = message, Parameters = null };
+        }
         if (messageObj != null)
         {
           // Forward to JavaScript bridge (which connects to model)

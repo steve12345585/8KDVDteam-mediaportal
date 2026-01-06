@@ -77,6 +77,30 @@ namespace EightKDVD.Player
     public bool Muted { get; set; } = false;
 
     public MediaItem MediaItem => _mediaItem;
+    public string Name => "8KDVD Player";
+    public PlayerState State
+    {
+      get
+      {
+        if (_isPlaying)
+          return _isPaused ? PlayerState.Paused : PlayerState.Active;
+        return PlayerState.Stopped;
+      }
+    }
+    public string MediaItemTitle
+    {
+      get
+      {
+        try
+        {
+          return _mediaItem?.Title ?? "Unknown";
+        }
+        catch
+        {
+          return "Unknown";
+        }
+      }
+    }
 
     public void Dispose()
     {

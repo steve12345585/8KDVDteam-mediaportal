@@ -3,7 +3,6 @@ using MediaPortal.Common;
 using MediaPortal.Common.Logging;
 using MediaPortal.Common.MediaManagement;
 using MediaPortal.UI.Presentation.Players;
-using MediaPortal.UI.Players;
 
 namespace EightKDVD.Player
 {
@@ -15,7 +14,7 @@ namespace EightKDVD.Player
   {
     private static readonly ILogger Logger = ServiceRegistration.Get<ILogger>();
 
-    public IPlayer CreatePlayer(MediaItem mediaItem)
+    public IPlayer GetPlayer(MediaItem mediaItem)
     {
       try
       {

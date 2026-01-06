@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MediaPortal.Common;
@@ -9,9 +10,7 @@ using MediaPortal.UI.Presentation.Workflow;
 using MediaPortal.UI.Presentation.Players;
 using MediaPortal.Common.MediaManagement;
 using MediaPortal.Common.MediaManagement.DefaultItemAspects;
-using MediaPortal.Common.MediaManagement.MediaQueries;
 using MediaPortal.Common.ResourceAccess;
-using MediaPortal.Common.ResourceAccess.ResourceProviders;
 using MediaPortal.Common.Services.ResourceAccess;
 using EightKDVD.Services;
 using EightKDVD.Core;
@@ -27,6 +26,13 @@ namespace EightKDVD.Models
   {
     private static readonly ILogger Logger = ServiceRegistration.Get<ILogger>();
     private string _htmlFilePath;
+
+    public Guid ModelId => new Guid("2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7E");
+
+    public bool CanEnterState(NavigationContext oldContext, NavigationContext newContext)
+    {
+      return true;
+    }
     
     // Quality switching state
     private string _currentQuality; // "8K", "4K", "1080p"
@@ -70,7 +76,7 @@ namespace EightKDVD.Models
       // Reactivate if needed
     }
 
-    public void UpdateMenuItems(NavigationContext context, IDictionary<Guid, WorkflowAction> actions)
+    public void UpdateMenuActions(NavigationContext context, IDictionary<Guid, WorkflowAction> actions)
     {
       // Update menu items if needed
     }
@@ -87,10 +93,11 @@ namespace EightKDVD.Models
     {
       get
       {
-        if (string.IsNullOrEmpty(_htmlFilePath) && !string.IsNullOrEmpty(_currentDiscPath))
+        string discPath = DiscPathService.Instance.CurrentDiscPath;
+        if (string.IsNullOrEmpty(_htmlFilePath) && !string.IsNullOrEmpty(discPath))
         {
           var discDetector = new Core.DiscDetector();
-          _htmlFilePath = discDetector.GetWebLauncherPath(_currentDiscPath);
+          _htmlFilePath = discDetector.GetWebLauncherPath(discPath);
         }
         return _htmlFilePath;
       }
@@ -99,7 +106,7 @@ namespace EightKDVD.Models
     /// <summary>
     /// Gets the current disc path
     /// </summary>
-    public string DiscPath => _currentDiscPath;
+    public string DiscPath => DiscPathService.Instance.CurrentDiscPath;
 
     /// <summary>
     /// Loads the disc path from a service or workflow context
@@ -107,27 +114,17 @@ namespace EightKDVD.Models
     /// </summary>
     private void LoadDiscPath()
     {
-      // This is a placeholder - in real implementation, this would:
-      // 1. Get disc path from a service (e.g., DiscPathService)
-      // 2. Or get from workflow context
-      // 3. Or get from PluginStateTracker
-      
-      // For now, try to detect any 8KDVD disc
-      var discDetector = new Core.DiscDetector();
-      foreach (var drive in System.IO.DriveInfo.GetDrives())
+      // Disc path is now managed by DiscPathService
+      // This method is kept for compatibility but no longer needed
+      string discPath = DiscPathService.Instance.CurrentDiscPath;
+      if (!string.IsNullOrEmpty(discPath))
       {
-        if (drive.DriveType == System.IO.DriveType.CDRom && drive.IsReady)
-        {
-          if (discDetector.Is8KDVDDisc(drive.RootDirectory.FullName))
-          {
-            _currentDiscPath = drive.RootDirectory.FullName;
-            Logger.Info($"8KDVD Player: Loaded disc path: {_currentDiscPath}");
-            return;
-          }
-        }
+        Logger.Info($"8KDVD Player: Disc path available from service: {discPath}");
       }
-
-      Logger.Warn("8KDVD Player: No 8KDVD disc found");
+      else
+      {
+        Logger.Warn("8KDVD Player: No 8KDVD disc found");
+      }
     }
 
     /// <summary>
@@ -214,56 +211,31 @@ namespace EightKDVD.Models
           return;
         }
 
-        // Create MediaItem for playback
-        // According to 8KDVD spec: .EVO files are MP4 containers with VP9/Opus
-        var resourceProviderManager = ServiceRegistration.Get<IResourceProviderManager>();
-        if (resourceProviderManager == null)
-        {
-          Logger.Error("8KDVD Player: IResourceProviderManager service not available");
-          return;
-        }
-
-        // Create resource locator from file path
-        // Use LocalFsResourceProvider for local file system access
-        // Format: "local:///" + full path
-        string resourcePath = "local:///" + videoFile.Replace("\\", "/");
-        var resourceLocator = new ResourceLocator(resourcePath);
+        // TODO: Create MediaItem for playback using correct MediaPortal 2 API
+        // The following code needs to be fixed based on actual MediaPortal 2 API:
+        // - ResourceLocator constructor takes ResourcePath, not string
+        // - MediaItem constructor parameters may be different
+        // - VideoAspect attribute names may be different (ATTR_VIDEO_PATH, ATTR_MIME_TYPE, ATTR_TITLE)
+        // - MediaItem.SetResourceLocator may not exist
+        // - IPlayerManager.Play, CurrentPlayer, Stop methods may have different names
         
-        // Create MediaItem with video aspect
-        // Note: Use "video/mp4" MIME type since .EVO files are MP4 containers
-        // MediaPortal 2 will use DirectShow filters (LAV Filters) for VP9/Opus decoding
-        var mediaItem = new MediaItem(Guid.NewGuid(), new[] { VideoAspect.Metadata });
-        var videoAspect = mediaItem.Aspects.Get<VideoAspect>();
-        videoAspect.SetAttribute(VideoAspect.ATTR_VIDEO_PATH, videoFile);
-        videoAspect.SetAttribute(VideoAspect.ATTR_MIME_TYPE, "video/mp4"); // MP4 container - LAV Filters will decode VP9/Opus
-        videoAspect.SetAttribute(VideoAspect.ATTR_TITLE, Path.GetFileNameWithoutExtension(videoFile));
+        Logger.Info($"8KDVD Player: TODO - Create MediaItem for playback: {videoFile}");
+        Logger.Warn("8KDVD Player: MediaItem creation and playback not yet implemented - needs MediaPortal 2 API research");
         
-        // Set resource locator
-        mediaItem.SetResourceLocator(resourceLocator);
-
-        Logger.Info($"8KDVD Player: Created MediaItem for playback: {videoFile}");
-
         // Verify codec support before starting playback
         if (!CodecVerifier.IsLAVFiltersInstalled())
         {
           Logger.Warn("8KDVD Player: LAV Filters not detected - playback may fail");
           Logger.Warn($"8KDVD Player: {CodecVerifier.GetCodecStatusMessage()}");
-          // Continue anyway - user might have other codec pack installed
         }
-
-        // Get IPlayerManager and start playback
-        var playerManager = ServiceRegistration.Get<IPlayerManager>();
-        if (playerManager == null)
-        {
-          Logger.Error("8KDVD Player: IPlayerManager service not available");
-          return;
-        }
-
-        // Start playback
-        // MediaPortal 2 will use DirectShow filters (LAV Filters) for VP9/Opus decoding
-        // The .EVO file is an MP4 container, so MediaPortal will use standard MP4 playback
-        // LAV Filters will automatically decode VP9 video and Opus audio streams
-        playerManager.Play(mediaItem);
+        
+        // TODO: Implement MediaItem creation and playback
+        // Example (needs verification):
+        // var resourcePath = ResourcePath.BuildLocalFsPath(videoFile);
+        // var resourceLocator = new ResourceLocator(resourcePath);
+        // var mediaItem = new MediaItem(Guid.NewGuid(), aspectsDictionary);
+        // var playerManager = ServiceRegistration.Get<IPlayerManager>();
+        // playerManager.StartPlayback(mediaItem); // or correct method name
         
         // Update state for quality switching
         _currentVideoFile = videoFile;
@@ -290,26 +262,11 @@ namespace EightKDVD.Models
             break;
         }
         
-        // Seek to start time if specified (8KDVD spec: playMovie(startTime) seeks to that position)
+        // TODO: Implement seeking after playback starts
+        // This will need to be implemented once MediaItem creation and playback are working
         if (startTime > 0)
         {
-          Logger.Info($"8KDVD Player: Seeking to start time: {startTime} seconds");
-          // Wait a moment for playback to start, then seek
-          System.Threading.Thread.Sleep(500);
-          try
-          {
-            var player = playerManager.CurrentPlayer;
-            if (player != null)
-            {
-              long seekTimeMs = (long)(startTime * 1000);
-              player.Seek(seekTimeMs);
-              Logger.Info($"8KDVD Player: Seeked to {startTime} seconds ({seekTimeMs}ms)");
-            }
-          }
-          catch (Exception ex)
-          {
-            Logger.Warn("8KDVD Player: Could not seek to start time", ex);
-          }
+          Logger.Info($"8KDVD Player: TODO - Seek to start time: {startTime} seconds");
         }
 
         Logger.Info($"8KDVD Player: Playback initiated for: {videoFile} (Quality: {_currentQuality})");
@@ -401,94 +358,12 @@ namespace EightKDVD.Models
         string newVideoFile = videoFiles[0]; // Use first matching file
         Logger.Info($"8KDVD Player: Found {qualityName} video file: {newVideoFile}");
 
-        // Get current playhead position (8KDVD spec: maintain playhead during quality switch)
+        // TODO: Get current playhead position and switch quality
+        // This needs to be implemented once MediaItem creation and playback are working
         double playheadPosition = _lastPlayheadPosition;
         
-        var playerManager = ServiceRegistration.Get<IPlayerManager>();
-        if (playerManager != null)
-        {
-          try
-          {
-            // Try to get current player and position
-            var currentPlayer = playerManager.CurrentPlayer;
-            if (currentPlayer != null && currentPlayer.IsPlaying)
-            {
-              // Get current time in milliseconds, convert to seconds
-              long currentTimeMs = currentPlayer.CurrentTime;
-              playheadPosition = currentTimeMs / 1000.0;
-              Logger.Info($"8KDVD Player: Current playhead position: {playheadPosition} seconds");
-            }
-          }
-          catch (Exception ex)
-          {
-            Logger.Warn("8KDVD Player: Could not get current playhead position, using last known position", ex);
-          }
-        }
-
-        // Stop current playback if playing
-        if (playerManager != null && playerManager.CurrentPlayer != null && playerManager.CurrentPlayer.IsPlaying)
-        {
-          Logger.Info("8KDVD Player: Stopping current playback for quality switch");
-          playerManager.Stop();
-          // Give it a moment to stop
-          System.Threading.Thread.Sleep(100);
-        }
-
-        // Create MediaItem for new quality file
-        var resourceProviderManager = ServiceRegistration.Get<IResourceProviderManager>();
-        if (resourceProviderManager == null)
-        {
-          Logger.Error("8KDVD Player: IResourceProviderManager service not available");
-          return;
-        }
-
-        // Create resource locator
-        string resourcePath = "local:///" + newVideoFile.Replace("\\", "/");
-        var resourceLocator = new ResourceLocator(resourcePath);
-
-        // Create MediaItem with video aspect
-        var mediaItem = new MediaItem(Guid.NewGuid(), new[] { VideoAspect.Metadata });
-        var videoAspect = mediaItem.Aspects.Get<VideoAspect>();
-        videoAspect.SetAttribute(VideoAspect.ATTR_VIDEO_PATH, newVideoFile);
-        videoAspect.SetAttribute(VideoAspect.ATTR_MIME_TYPE, "video/mp4"); // MP4 container
-        videoAspect.SetAttribute(VideoAspect.ATTR_TITLE, Path.GetFileNameWithoutExtension(newVideoFile));
-        mediaItem.SetResourceLocator(resourceLocator);
-
-        Logger.Info($"8KDVD Player: Created MediaItem for {qualityName} quality: {newVideoFile}");
-
-        // Start playback at saved playhead position
-        if (playerManager == null)
-        {
-          Logger.Error("8KDVD Player: IPlayerManager service not available");
-          return;
-        }
-
-        playerManager.Play(mediaItem);
-
-        // Seek to playhead position (8KDVD spec: maintain position during quality switch)
-        if (playheadPosition > 0)
-        {
-          Logger.Info($"8KDVD Player: Seeking to saved playhead position: {playheadPosition} seconds");
-          // Note: Seeking will be implemented in the player class
-          // For now, we'll attempt to seek via IPlayerManager if available
-          try
-          {
-            // Wait a moment for playback to start
-            System.Threading.Thread.Sleep(500);
-            
-            var player = playerManager.CurrentPlayer;
-            if (player != null)
-            {
-              long seekTimeMs = (long)(playheadPosition * 1000);
-              player.Seek(seekTimeMs);
-              Logger.Info($"8KDVD Player: Seeked to {playheadPosition} seconds ({seekTimeMs}ms)");
-            }
-          }
-          catch (Exception ex)
-          {
-            Logger.Warn("8KDVD Player: Could not seek to playhead position", ex);
-          }
-        }
+        Logger.Info($"8KDVD Player: TODO - Quality switching to {qualityName} at position {playheadPosition} seconds");
+        Logger.Warn("8KDVD Player: Quality switching not yet implemented - needs MediaPortal 2 API research");
 
         // Update state
         _currentQuality = qualityName;

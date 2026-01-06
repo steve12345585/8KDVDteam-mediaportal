@@ -21,11 +21,15 @@
     <Reference Include="MediaPortal.UI.SkinEngine">
       <HintPath>$(MediaPortal2Path)\MediaPortal.UI.SkinEngine.dll</HintPath>
     </Reference>
+    <!-- WPF References for WebView2 -->
+    <Reference Include="PresentationFramework" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="System.Xaml" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2045.28" />
-    <PackageReference Include="Microsoft.Web.WebView2.WinForms" Version="1.0.2045.28" />
   </ItemGroup>
 
   <ItemGroup>

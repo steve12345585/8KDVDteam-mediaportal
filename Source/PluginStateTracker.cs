@@ -3,8 +3,7 @@ using System.IO;
 using System.Linq;
 using MediaPortal.Common;
 using MediaPortal.Common.Logging;
-using MediaPortal.Common.Services.Logging;
-using MediaPortal.UI.Presentation.Players;
+using MediaPortal.Common.PluginManager;
 using MediaPortal.UI.Presentation.Workflow;
 using EightKDVD.Services;
 using EightKDVD.Core;
@@ -34,21 +33,34 @@ namespace EightKDVD
       StopDiscMonitoring();
     }
 
-    public void Continue(PluginRuntime pluginRuntime)
+    public void Continue()
     {
       Logger.Info("8KDVD Player: Plugin continued");
       StartDiscMonitoring();
     }
 
-    public void Pause(PluginRuntime pluginRuntime)
+    public void Pause()
     {
       Logger.Info("8KDVD Player: Plugin paused");
       StopDiscMonitoring();
     }
 
-    public void Shutdown(PluginRuntime pluginRuntime)
+    public void Shutdown()
     {
       Logger.Info("8KDVD Player: Plugin shutting down");
+      StopDiscMonitoring();
+    }
+
+    public bool RequestEnd()
+    {
+      Logger.Info("8KDVD Player: Request end");
+      StopDiscMonitoring();
+      return true; // Allow plugin to end
+    }
+
+    public void Stop()
+    {
+      Logger.Info("8KDVD Player: Stop requested");
       StopDiscMonitoring();
     }
 

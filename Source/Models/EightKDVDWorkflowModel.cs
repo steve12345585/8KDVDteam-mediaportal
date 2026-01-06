@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MediaPortal.Common;
 using MediaPortal.Common.Logging;
 using MediaPortal.UI.Presentation.Models;
@@ -14,6 +15,13 @@ namespace EightKDVD.Models
   public class EightKDVDWorkflowModel : IWorkflowModel
   {
     private static readonly ILogger Logger = ServiceRegistration.Get<ILogger>();
+
+    public Guid ModelId => new Guid("1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D");
+
+    public bool CanEnterState(NavigationContext oldContext, NavigationContext newContext)
+    {
+      return true;
+    }
 
     public void EnterModelContext(NavigationContext oldContext, NavigationContext newContext)
     {
@@ -40,7 +48,7 @@ namespace EightKDVD.Models
       // Reactivate
     }
 
-    public void UpdateMenuItems(NavigationContext context, IDictionary<Guid, WorkflowAction> actions)
+    public void UpdateMenuActions(NavigationContext context, IDictionary<Guid, WorkflowAction> actions)
     {
       // Update menu items if needed
     }
