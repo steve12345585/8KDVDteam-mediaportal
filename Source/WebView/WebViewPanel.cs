@@ -50,7 +50,7 @@ namespace EightKDVD.Controls
       if (panel._model != null && panel._bridge == null)
       {
         panel._bridge = new JavaScriptBridge(panel._model);
-        panel.Logger.Debug("8KDVD Player: JavaScript bridge connected to model");
+        Logger.Debug("8KDVD Player: JavaScript bridge connected to model");
       }
     }
 

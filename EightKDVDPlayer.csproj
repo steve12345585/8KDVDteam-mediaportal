@@ -21,6 +21,9 @@
     <Reference Include="MediaPortal.UI.SkinEngine">
       <HintPath>$(MediaPortal2Path)\MediaPortal.UI.SkinEngine.dll</HintPath>
     </Reference>
+    <Reference Include="Configuration">
+      <HintPath>$(MediaPortal2Path)\Plugins\Configuration\Configuration.dll</HintPath>
+    </Reference>
     <!-- WPF References for WebView2 -->
     <Reference Include="PresentationFramework" />
     <Reference Include="PresentationCore" />

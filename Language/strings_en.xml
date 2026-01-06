@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Language>
+<resources>
   <Section Name="EightKDVD">
     <String Name="MenuEntry" Text="8KDVD Player"/>
     <String Name="Playing" Text="Playing 8KDVD"/>
@@ -17,4 +17,4 @@
     <String Name="Settings.AutoPlay" Text="Auto-Play on Disc Insertion"/>
     <String Name="Settings.AutoPlay.Help" Text="Automatically launch menu when 8KDVD disc is inserted"/>
   </Section>
-</Language>
+</resources>

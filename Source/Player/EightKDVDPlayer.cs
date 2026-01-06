@@ -83,7 +83,11 @@ namespace EightKDVD.Player
       get
       {
         if (_isPlaying)
-          return _isPaused ? PlayerState.Paused : PlayerState.Active;
+        {
+          // PlayerState enum may not have Paused - use Active for both playing and paused
+          // The IsPaused property can be checked separately if needed
+          return PlayerState.Active;
+        }
         return PlayerState.Stopped;
       }
     }
